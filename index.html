@@ -7,33 +7,36 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Auth Container -->
-<div id="auth-container" style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
-  <h2 id="auth-title">Login</h2>
-  <form id="auth-form">
-    <input type="email" id="auth-email" placeholder="Email" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
-    <input type="password" id="auth-password" placeholder="Password" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
-    <button type="submit" id="auth-submit-btn" style="width: 100%; padding: 8px;">Login</button>
-  </form>
-  <p style="margin-top: 10px; text-align: center;">
-    <a href="#" id="toggle-auth">Need an account? Register</a>
-  </p>
-</div>
 
-<!-- App Header with Logout -->
-<div id="app-header" style="display: none; justify-content: space-between; align-items: center;">
-  <span>Logged in as <strong id="user-display"></strong></span>
-  <button id="logout-btn">Logout</button>
-</div>
+  <!-- Auth Container (Visible when logged out) -->
+  <div id="auth-container" style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h2 id="auth-title">Login</h2>
+    <form id="auth-form">
+      <input type="email" id="auth-email" placeholder="Email" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+      <input type="password" id="auth-password" placeholder="Password" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+      <button type="submit" id="auth-submit-btn" style="width: 100%; padding: 8px;">Login</button>
+    </form>
+    <p style="margin-top: 10px; text-align: center;">
+      <a href="#" id="toggle-auth">Need an account? Register</a>
+    </p>
+  </div>
 
-  <h1>Task Manager</h1>
-  
-  <form id="task-form">
-    <input type="text" id="task-input" placeholder="Enter new task..." required />
-    <button type="submit">Add Task</button>
-  </form>
+  <!-- Task App Container (Hidden until logged in) -->
+  <div id="task-app-container" style="display: none; max-width: 500px; margin: 20px auto;">
+    <div id="app-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <span>Logged in</span>
+      <button id="logout-btn">Logout</button>
+    </div>
 
-  <ul id="task-list"></ul>
+    <h1>Task Manager</h1>
+
+    <form id="task-form">
+      <input type="text" id="task-input" placeholder="Enter new task..." required />
+      <button type="submit">Add Task</button>
+    </form>
+
+    <ul id="task-list"></ul>
+  </div>
 
   <script src="script.js"></script>
 </body>
