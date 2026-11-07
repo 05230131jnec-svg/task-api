@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/tasks';
+const API_URL = 'https://task-api-cv4k.onrender.com/tasks';
 const taskForm = document.getElementById('task-form');
 const taskInput = document.getElementById('task-input');
 const taskList = document.getElementById('task-list');
