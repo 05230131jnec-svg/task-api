@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const taskRoutes = require('./src/routes/taskRoutes');
+const authRoutes = require('./src/routes/authRoutes'); // <--- ADD THIS
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,11 +15,13 @@ app.use(cors({
     'http://localhost:3000'
   ]
 }));
+
 app.get('/', (req, res) => {
   res.json({ message: 'Task API (MVC version) is ready!' });
 });
 
 app.use('/tasks', taskRoutes);
+app.use('/auth', authRoutes); // <--- ADD THIS
 
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
