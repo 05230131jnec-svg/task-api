@@ -1,64 +1,91 @@
-const API_URL = 'https://task-api-cv4k.onrender.com/tasks';
-const taskForm = document.getElementById('task-form');
-const taskInput = document.getElementById('task-input');
-const taskList = document.getElementById('task-list');
+const API_URL = 'https://task-api-cv4k.onrender.com';
+let isLoginMode = true;
 
-// 1. Fetch & display tasks
-async function fetchTasks() {
+// Toggle Login / Register UI
+document.getElementById('toggle-auth')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  isLoginMode = !isLoginMode;
+  document.getElementById('auth-title').innerText = isLoginMode ? 'Login' : 'Register';
+  document.getElementById('auth-submit-btn').innerText = isLoginMode ? 'Login' : 'Register';
+  document.getElementById('toggle-auth').innerText = isLoginMode ? 'Need an account? Register' : 'Have an account? Login';
+});
+
+// Submit Login / Register Form
+document.getElementById('auth-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value;
+  const password = document.getElementById('auth-password').value;
+  const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+
   try {
-    const res = await fetch(API_URL);
-    const tasks = await res.json();
-    taskList.innerHTML = '';
-    
-    tasks.forEach(task => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span style="text-decoration: ${task.completed ? 'line-through' : 'none'}">
-          ${task.title}
-        </span>
-        <button onclick="toggleTask(${task.id}, ${!task.completed})">
-          ${task.completed ? 'Undo' : 'Complete'}
-        </button>
-        <button onclick="deleteTask(${task.id})">Delete</button>
-      `;
-      taskList.appendChild(li);
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
     });
-  } catch (error) {
-    console.error('Failed to load tasks:', error);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+    if (isLoginMode) {
+      localStorage.setItem('token', data.token);
+      checkAuthStatus();
+    } else {
+      alert('Registration successful! Please log in.');
+      document.getElementById('toggle-auth').click();
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+// Helper for JWT Headers
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+}
+
+// Show/Hide forms based on token
+function checkAuthStatus() {
+  const token = localStorage.getItem('token');
+  const authContainer = document.getElementById('auth-container');
+  const taskAppContainer = document.getElementById('task-app-container');
+
+  if (token) {
+    if (authContainer) authContainer.style.display = 'none';
+    if (taskAppContainer) taskAppContainer.style.display = 'block';
+    fetchTasks();
+  } else {
+    if (authContainer) authContainer.style.display = 'block';
+    if (taskAppContainer) taskAppContainer.style.display = 'none';
   }
 }
 
-// 2. Add a new task
-taskForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const title = taskInput.value.trim();
-  if (!title) return;
-
-  await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title })
-  });
-
-  taskInput.value = '';
-  fetchTasks();
+// Logout Listener
+document.getElementById('logout-btn')?.addEventListener('click', () => {
+  localStorage.removeItem('token');
+  checkAuthStatus();
 });
 
-// 3. Toggle task completion
-async function toggleTask(id, completed) {
-  await fetch(`${API_URL}/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ completed })
-  });
-  fetchTasks();
+// Fetch tasks with Auth header attached
+async function fetchTasks() {
+  try {
+    const res = await fetch(`${API_URL}/tasks`, { headers: getAuthHeaders() });
+    if (res.status === 401 || res.status === 400) {
+      localStorage.removeItem('token');
+      checkAuthStatus();
+      return;
+    }
+    const tasks = await res.json();
+    if (typeof renderTasks === 'function') {
+      renderTasks(tasks);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-// 4. Delete task
-async function deleteTask(id) {
-  await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-  fetchTasks();
-}
-
-// Load tasks on startup
-fetchTasks();
+// Run auth check on page load
+checkAuthStatus();
