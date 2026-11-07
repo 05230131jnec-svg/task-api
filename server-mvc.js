@@ -7,7 +7,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://05230131jnec-svg.github.io',
+    'http://127.0.0.1:5500',
+    'http://localhost:3000'
+  ]
+}));
 app.get('/', (req, res) => {
   res.json({ message: 'Task API (MVC version) is ready!' });
 });
