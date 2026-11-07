@@ -4,7 +4,7 @@
   "description": "SYD204 Backend Unit - Task List API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server-mvc.js",
     "dev": "npx nodemon server.js",
     "start:mvc": "node server-mvc.js"
   },
